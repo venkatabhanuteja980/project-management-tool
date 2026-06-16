@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^1.18.0",
+    "gantt-task-react": "^0.3.9",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-hot-toast": "^2.6.0",

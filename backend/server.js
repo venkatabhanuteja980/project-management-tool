@@ -28,6 +28,11 @@ app.use(
   "/api/tasks",
   require("./routes/taskRoutes")
 );
+
+app.use(
+  "/api/comments",
+  require("./routes/commentRoutes")
+);
 app.get("/", (req, res) => {
   res.json({
     success: true,

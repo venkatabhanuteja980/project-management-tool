@@ -30,6 +30,18 @@ function DashboardLayout({ children }) {
           >
             Tasks
           </Link>
+         <Link
+  to="/kanban"
+  className="block hover:text-blue-400"
+>
+  Kanban
+</Link>
+<Link
+  to="/timeline"
+  className="block hover:text-blue-400"
+>
+  Timeline
+</Link>
         </nav>
       </aside>
 

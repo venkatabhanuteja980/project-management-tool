@@ -9,6 +9,8 @@ import Register from "../pages/Register";
 import Dashboard from "../pages/DashBoard";
 import Projects from "../pages/Projects";
 import Tasks from "../pages/Tasks";
+import Kanban from "../pages/Kanban";
+import GanttPage from "../pages/GanttPage";
 
 function AppRoutes() {
   return (
@@ -28,8 +30,16 @@ function AppRoutes() {
   path="/dashboard"
   element={<Dashboard />}
 />
+<Route
+  path="/kanban"
+  element={<Kanban />}
+/>
 <Route path="/projects" element={<Projects />} />
 <Route path="/tasks" element={<Tasks />} />
+<Route
+  path="/timeline"
+  element={<GanttPage />}
+/>
       </Routes>
     </BrowserRouter>
   );
