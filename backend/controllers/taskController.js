@@ -1,4 +1,6 @@
 const Task = require("../models/Task");
+const { createLog } = require("./activityController");
+const { createNotificationHelper } = require("./notificationController");
 
 const createTask = async (req, res) => {
   try {
@@ -6,6 +8,12 @@ const createTask = async (req, res) => {
       ...req.body,
       createdBy: req.user._id
     });
+
+    await createLog(req.user._id, "task_created", `created task "${task.title}"`, task.project, task._id);
+
+    if (task.assignee) {
+      await createNotificationHelper(task.assignee, `You have been assigned to task: "${task.title}"`);
+    }
 
     res.status(201).json({
       success: true,
@@ -65,6 +73,14 @@ const getTaskById = async (req, res) => {
 
 const updateTask = async (req, res) => {
   try {
+    const oldTask = await Task.findById(req.params.id);
+    if (!oldTask) {
+      return res.status(404).json({
+        success: false,
+        message: "Task not found"
+      });
+    }
+
     const task = await Task.findByIdAndUpdate(
       req.params.id,
       req.body,
@@ -74,12 +90,19 @@ const updateTask = async (req, res) => {
       }
     );
 
-    if (!task) {
-      return res.status(404).json({
-        success: false,
-        message: "Task not found"
-      });
+    let detailMsg = `updated task "${task.title}"`;
+    if (req.body.status && req.body.status !== oldTask.status) {
+      detailMsg = `changed status of "${task.title}" to "${task.status}"`;
+      await createNotificationHelper(task.createdBy, `Task "${task.title}" status changed to "${task.status}"`);
+      if (task.assignee && String(task.assignee) !== String(task.createdBy)) {
+        await createNotificationHelper(task.assignee, `Task "${task.title}" status changed to "${task.status}"`);
+      }
+    } else if (req.body.assignee && String(req.body.assignee) !== String(oldTask.assignee)) {
+      detailMsg = `assigned task "${task.title}"`;
+      await createNotificationHelper(req.body.assignee, `You have been assigned to task: "${task.title}"`);
     }
+
+    await createLog(req.user._id, "task_updated", detailMsg, task.project, task._id);
 
     res.status(200).json({
       success: true,

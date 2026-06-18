@@ -3,7 +3,8 @@ const express = require("express");
 const {
   registerUser,
   loginUser,
-  getMe
+  getMe,
+  getUsers
 } = require("../controllers/authController");
 
 const {
@@ -17,5 +18,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 
 router.get("/me", protect, getMe);
+
+router.get("/users", protect, getUsers);
 
 module.exports = router;

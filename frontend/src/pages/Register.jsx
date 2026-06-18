@@ -1,81 +1,182 @@
-import { useState } from "react";
-import API from "../services/api";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Button from "../components/Button";
 
-function Register() {
-  const [formData, setFormData] =
-    useState({
-      name: "",
-      email: "",
-      password: "",
-    });
+export function Register() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "Team Member",
+  });
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]:
-        e.target.value,
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
     try {
-      await API.post(
-        "/auth/register",
-        formData
+      const res = await register(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.role
       );
 
-      alert(
-        "Registration Successful"
-      );
-    } catch (error) {
-      alert(
-        error.response?.data?.message
-      );
+      if (res.success) {
+        navigate("/dashboard");
+      } else {
+        setError(res.message);
+      }
+    } catch (err) {
+      setError("Registration failed. Please check your credentials.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-lg shadow-md w-96"
-      >
-        <h1 className="text-2xl font-bold mb-6">
-          Register
-        </h1>
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-slate-50">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <div className="h-12 w-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-indigo-600/20">
+            A
+          </div>
+        </div>
+        <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-slate-900">
+          Create a new account
+        </h2>
+        <p className="mt-2 text-center text-sm text-slate-500">
+          Or{" "}
+          <Link
+            to="/"
+            className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+          >
+            sign in to your existing account
+          </Link>
+        </p>
+      </div>
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          className="w-full border p-3 mb-4 rounded"
-          onChange={handleChange}
-        />
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-4 shadow-sm border border-slate-100 sm:rounded-xl sm:px-10">
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            {error && (
+              <div className="rounded-lg bg-rose-50 border border-rose-100 p-3.5 text-sm text-rose-600 animate-fade-in">
+                {error}
+              </div>
+            )}
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          className="w-full border p-3 mb-4 rounded"
-          onChange={handleChange}
-        />
+            <div>
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Full Name
+              </label>
+              <div className="mt-1">
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-colors"
+                  placeholder="John Doe"
+                />
+              </div>
+            </div>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          className="w-full border p-3 mb-4 rounded"
-          onChange={handleChange}
-        />
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Email address
+              </label>
+              <div className="mt-1">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-colors"
+                  placeholder="name@company.com"
+                />
+              </div>
+            </div>
 
-        <button
-          className="w-full bg-green-600 text-white p-3 rounded"
-        >
-          Register
-        </button>
-      </form>
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Password
+              </label>
+              <div className="mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-800 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-colors"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="role"
+                className="block text-sm font-medium text-slate-700"
+              >
+                System Role
+              </label>
+              <div className="mt-1">
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-800 bg-white focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm transition-colors"
+                >
+                  <option value="Team Member">Team Member (General access)</option>
+                  <option value="Manager">Manager (Can manage projects & tasks)</option>
+                  <option value="Admin">Admin (Full administrative privileges)</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="primary"
+                loading={isSubmitting}
+                className="w-full justify-center"
+              >
+                Register
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

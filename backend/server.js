@@ -33,6 +33,14 @@ app.use(
   "/api/comments",
   require("./routes/commentRoutes")
 );
+app.use(
+  "/api/activities",
+  require("./routes/activityRoutes")
+);
+app.use(
+  "/api/notifications",
+  require("./routes/notificationRoutes")
+);
 app.get("/", (req, res) => {
   res.json({
     success: true,

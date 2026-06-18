@@ -1,12 +1,30 @@
 const Comment = require("../models/Comment");
+const Task = require("../models/Task");
+const { createLog } = require("./activityController");
+const { createNotificationHelper } = require("./notificationController");
 
 const createComment = async (req, res) => {
   try {
+    const task = await Task.findById(req.body.task);
     const comment = await Comment.create({
       task: req.body.task,
       content: req.body.content,
       user: req.user._id
     });
+
+    if (task) {
+      await createLog(req.user._id, "comment_added", `commented on task "${task.title}"`, task.project, task._id);
+      
+      const commenterName = req.user.name;
+      const commentMsg = `${commenterName} commented on task: "${task.title}"`;
+      
+      if (String(task.createdBy) !== String(req.user._id)) {
+        await createNotificationHelper(task.createdBy, commentMsg);
+      }
+      if (task.assignee && String(task.assignee) !== String(req.user._id) && String(task.assignee) !== String(task.createdBy)) {
+        await createNotificationHelper(task.assignee, commentMsg);
+      }
+    }
 
     res.status(201).json({
       success: true,

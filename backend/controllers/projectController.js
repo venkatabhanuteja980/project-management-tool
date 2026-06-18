@@ -1,4 +1,5 @@
 const Project = require("../models/Project");
+const { createLog } = require("./activityController");
 
 const createProject = async (req, res) => {
   try {
@@ -6,6 +7,8 @@ const createProject = async (req, res) => {
       ...req.body,
       createdBy: req.user._id
     });
+
+    await createLog(req.user._id, "project_created", `created project "${project.name}"`, project._id);
 
     res.status(201).json({
       success: true,
@@ -80,6 +83,8 @@ const updateProject = async (req, res) => {
         message: "Project not found"
       });
     }
+
+    await createLog(req.user._id, "project_updated", `updated project "${project.name}"`, project._id);
 
     res.status(200).json({
       success: true,
