@@ -11,7 +11,7 @@ import Projects from "../pages/Projects";
 import ProjectDetails from "../pages/ProjectDetails";
 import Tasks from "../pages/Tasks";
 import Kanban from "../pages/Kanban";
-import GanttPage from "../pages/GanttPage";
+
 
 function AppRoutes() {
   return (
@@ -38,10 +38,7 @@ function AppRoutes() {
 <Route path="/projects" element={<Projects />} />
 <Route path="/projects/:id" element={<ProjectDetails />} />
 <Route path="/tasks" element={<Tasks />} />
-<Route
-  path="/timeline"
-  element={<GanttPage />}
-/>
+
       </Routes>
     </BrowserRouter>
   );
